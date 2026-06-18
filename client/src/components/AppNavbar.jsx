@@ -24,7 +24,7 @@ const AppNavbar = () => {
         </Link>
 
         {/* Desktop nav */}
-        <nav style={s.links}>
+        <nav className="nav-links" style={s.links}>
           <NavLink style={navLinkStyle} to="/">Events</NavLink>
           {isAuthenticated && (
             <NavLink style={navLinkStyle} to="/my-registrations">My Events</NavLink>
@@ -38,7 +38,7 @@ const AppNavbar = () => {
         </nav>
 
         {/* Desktop actions */}
-        <div style={s.actions}>
+        <div className="nav-actions" style={s.actions}>
           {isAuthenticated ? (
             <>
               <div style={s.userChip}>
@@ -64,6 +64,7 @@ const AppNavbar = () => {
 
         {/* Mobile toggle */}
         <button
+          className="mobile-toggle"
           style={s.mobileToggle}
           onClick={() => setMobileOpen(o => !o)}
           type="button"
@@ -159,19 +160,19 @@ const s = {
   },
   navLink: {
     alignItems: 'center',
-    borderRadius: 8,
+    borderBottom: '2px solid transparent',
     color: '#64748b',
     display: 'inline-flex',
     fontSize: '0.9rem',
     fontWeight: 500,
     gap: 5,
-    padding: '6px 12px',
+    padding: '8px 12px 6px',
     textDecoration: 'none',
     transition: 'color 0.15s, background 0.15s',
     whiteSpace: 'nowrap',
   },
   navLinkActive: {
-    background: '#fff7ed',
+    borderBottomColor: '#f97316',
     color: '#ea580c',
     fontWeight: 600,
   },
@@ -228,6 +229,7 @@ const s = {
     fontSize: '0.9rem',
     fontWeight: 500,
     padding: '7px 12px',
+    textDecoration: 'none',
   },
   loginLinkActive: { color: '#ea580c' },
   registerBtn: {
@@ -238,6 +240,7 @@ const s = {
     fontSize: '0.9rem',
     fontWeight: 600,
     padding: '8px 16px',
+    textDecoration: 'none',
     whiteSpace: 'nowrap',
   },
   mobileToggle: {
