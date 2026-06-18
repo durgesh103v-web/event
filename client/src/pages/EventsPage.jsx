@@ -31,6 +31,11 @@ const locationOptions = [
   'Thane', 'Navi Mumbai', 'Pune', 'Bengaluru', 'Hyderabad', 'Delhi',
 ];
 
+const locationFilterOptions = [
+  { label: 'All Locations', value: '' },
+  ...locationOptions.map(item => ({ label: item, value: item })),
+];
+
 const dateOptions = [
   { label: 'Any Date', value: '' },
   { label: 'Today', value: 'today' },
@@ -208,7 +213,7 @@ const EventsPage = () => {
                 <img
                   alt="Event audience"
                   decoding="async"
-                  fetchPriority="high"
+                  fetchpriority="high"
                   src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80"
                   style={s.heroImg}
                 />
@@ -260,7 +265,7 @@ const EventsPage = () => {
             <FilterSelect
               ariaLabel="Location"
               onChange={(value) => { setLocation(value); fetchEvents(1, query, category, value, date); }}
-              options={[{ label: 'All Locations', value: '' }, ...locationOptions.map(item => ({ label: item, value: item }))]}
+              options={locationFilterOptions}
               value={location}
             />
           </div>

@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { Calendar, MapPin, Users, Heart, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { memo, useMemo, useState } from 'react';
@@ -10,6 +9,11 @@ const CATEGORY_COLORS = {
   Design:     { bg: '#4a174f', text: '#f0abfc', dot: '#d946ef' },
 };
 const defaultCatColor = { bg: '#431f12', text: '#fdba74', dot: '#f97316' };
+const eventDateFormatter = new Intl.DateTimeFormat('en-GB', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
 
 const getOptimizedImageUrl = (url) => {
   if (!url) return '';
@@ -64,7 +68,7 @@ const EventCard = ({ event }) => {
           <div style={s.meta}>
             <span style={s.metaItem}>
               <Calendar size={13} style={{ flexShrink: 0 }} />
-              {format(new Date(event.startsAt), 'dd MMM yyyy')}
+              {eventDateFormatter.format(new Date(event.startsAt))}
             </span>
             <span style={s.metaItem}>
               <MapPin size={13} style={{ flexShrink: 0 }} />
