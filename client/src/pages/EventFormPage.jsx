@@ -77,7 +77,7 @@ const EventFormPage = () => {
           </div>
 
           {/* Category + Location */}
-          <div style={s.twoCol}>
+          <div className="event-form-grid" style={s.twoCol}>
             <div style={s.fieldGroup}>
               <label style={s.label}>Category <span style={s.req}>*</span></label>
               <input name="category" onChange={handleChange} placeholder="e.g. Technology" required style={s.input} value={form.category} />
@@ -89,7 +89,7 @@ const EventFormPage = () => {
           </div>
 
           {/* Date + Capacity */}
-          <div style={s.twoCol}>
+          <div className="event-form-grid" style={s.twoCol}>
             <div style={s.fieldGroup}>
               <label style={s.label}>Start date & time <span style={s.req}>*</span></label>
               <input name="startsAt" onChange={handleChange} required style={s.input} type="datetime-local" value={form.startsAt} />
@@ -137,40 +137,40 @@ const EventFormPage = () => {
 const s = {
   page: { display: 'flex', flexDirection: 'column', gap: 20, margin: '0 auto', maxWidth: 860, width: '100%' },
   loadingWrap: { alignItems: 'center', display: 'flex', flexDirection: 'column', padding: '80px 20px' },
-  spinner: { animation: 'spin 0.8s linear infinite', border: '3px solid #f1f5f9', borderRadius: '50%', borderTopColor: '#f97316', height: 36, width: 36 },
+  spinner: { animation: 'spin 0.8s linear infinite', border: '3px solid #273449', borderRadius: '50%', borderTopColor: '#f97316', height: 36, width: 36 },
   backLink: { alignItems: 'center', color: '#64748b', display: 'inline-flex', fontSize: '0.875rem', fontWeight: 600, gap: 6, textDecoration: 'none' },
   header: { display: 'flex', flexDirection: 'column', gap: 4 },
   eyebrow: {
-    background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 999, color: '#ea580c',
+    background: '#431f12', border: '1px solid #7c2d12', borderRadius: 999, color: '#fb923c',
     display: 'inline-block', fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.06em',
     padding: '5px 11px', textTransform: 'uppercase', width: 'fit-content',
   },
-  title: { color: '#0f172a', fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.03em', margin: 0 },
-  subtitle: { color: '#64748b', fontSize: '0.9rem', margin: 0 },
+  title: { color: '#f8fafc', fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.03em', margin: 0 },
+  subtitle: { color: '#94a3b8', fontSize: '0.9rem', margin: 0 },
   card: {
-    background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20,
-    boxShadow: '0 4px 16px rgba(15,23,42,0.05)', overflow: 'hidden',
+    background: '#0f172a', border: '1px solid #273449', borderRadius: 20,
+    boxShadow: '0 10px 28px rgba(0,0,0,0.25)', overflow: 'hidden',
   },
   form: { display: 'flex', flexDirection: 'column', gap: 20, padding: 28 },
   twoCol: { display: 'grid', gap: 16, gridTemplateColumns: 'repeat(2,minmax(0,1fr))' },
   fieldGroup: { display: 'flex', flexDirection: 'column', gap: 6 },
-  label: { color: '#374151', fontSize: '0.85rem', fontWeight: 600 },
+  label: { color: '#cbd5e1', fontSize: '0.85rem', fontWeight: 600 },
   req: { color: '#ef4444' },
   input: {
-    background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 10,
-    color: '#0f172a', fontFamily: 'inherit', fontSize: '0.92rem',
+    background: '#111c2e', border: '1.5px solid #334155', borderRadius: 10,
+    color: '#f1f5f9', fontFamily: 'inherit', fontSize: '0.92rem',
     minHeight: 44, outline: 'none', padding: '10px 14px', transition: 'border-color 0.15s', width: '100%',
   },
   textarea: { minHeight: 'unset', resize: 'vertical' },
   imgPreviewWrap: { borderRadius: 10, height: 140, marginTop: 8, overflow: 'hidden', width: '100%' },
   imgPreview: { height: '100%', objectFit: 'cover', width: '100%' },
   formFooter: {
-    alignItems: 'center', borderTop: '1px solid #f1f5f9',
+    alignItems: 'center', borderTop: '1px solid #273449',
     display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4, paddingTop: 20,
   },
   cancelBtn: {
-    alignItems: 'center', background: '#f1f5f9', border: '1px solid #e2e8f0',
-    borderRadius: 10, color: '#475569', display: 'inline-flex',
+    alignItems: 'center', background: '#111c2e', border: '1px solid #334155',
+    borderRadius: 10, color: '#cbd5e1', display: 'inline-flex',
     fontSize: '0.9rem', fontWeight: 600, minHeight: 44, padding: '0 20px', textDecoration: 'none',
   },
   saveBtn: {

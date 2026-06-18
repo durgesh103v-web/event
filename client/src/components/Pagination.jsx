@@ -92,10 +92,10 @@ const Pagination = ({ pagination, onPageChange }) => {
 const styles = StyleSheet.create({
   shell: {
     alignItems: 'center',
-    background: '#f8fafc',
-    border: '1px solid #e5e7eb',
+    background: '#0f172a',
+    border: '1px solid #273449',
     borderRadius: 999,
-    boxShadow: '0 10px 24px rgba(15, 23, 42, 0.08)',
+    boxShadow: '0 10px 24px rgba(0,0,0,0.25)',
     display: 'flex',
     gap: 14,
     justifyContent: 'center',
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     background: 'transparent',
     border: 0,
     borderRadius: 999,
-    color: '#64748b',
+    color: '#cbd5e1',
     display: 'inline-flex',
     fontSize: '0.92rem',
     fontWeight: 800,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     color: '#ffffff'
   },
   disabledButton: {
-    color: '#cbd5e1',
+    color: '#475569',
     cursor: 'not-allowed'
   },
   dots: {

@@ -28,9 +28,9 @@ const s = {
 };
 
 const styles = {
-  error: { background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' },
-  success: { background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d' },
-  info: { background: '#fff7ed', border: '1px solid #fed7aa', color: '#9a3412' },
+  error: { background: 'rgba(127,29,29,0.24)', border: '1px solid rgba(248,113,113,0.3)', color: '#fca5a5' },
+  success: { background: 'rgba(20,83,45,0.28)', border: '1px solid rgba(74,222,128,0.3)', color: '#86efac' },
+  info: { background: 'rgba(154,52,18,0.24)', border: '1px solid rgba(251,146,60,0.3)', color: '#fdba74' },
 };
 
 export default StatusMessage;

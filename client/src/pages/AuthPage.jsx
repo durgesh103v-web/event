@@ -66,7 +66,7 @@ const AuthPage = ({ mode }) => {
                 <label style={s.label}>Full name</label>
                 <div style={s.inputWrap}>
                   <User size={16} style={s.inputIcon} />
-                  <input name="name" onChange={handleChange} placeholder="Jane Smith" required style={s.input} type="text" value={form.name} />
+                  <input className="auth-input" name="name" onChange={handleChange} placeholder="Jane Smith" required style={s.input} type="text" value={form.name} />
                 </div>
               </div>
             )}
@@ -75,7 +75,7 @@ const AuthPage = ({ mode }) => {
               <label style={s.label}>Email address</label>
               <div style={s.inputWrap}>
                 <Mail size={16} style={s.inputIcon} />
-                <input name="email" onChange={handleChange} placeholder="you@example.com" required style={s.input} type="email" value={form.email} />
+                <input className="auth-input" name="email" onChange={handleChange} placeholder="you@example.com" required style={s.input} type="email" value={form.email} />
               </div>
             </div>
 
@@ -84,6 +84,7 @@ const AuthPage = ({ mode }) => {
               <div style={s.inputWrap}>
                 <Lock size={16} style={s.inputIcon} />
                 <input
+                  className="auth-input"
                   minLength={6}
                   name="password"
                   onChange={handleChange}
@@ -121,8 +122,8 @@ const AuthPage = ({ mode }) => {
 
 const s = {
   page: {
-    background: '#fff',
-    border: '1px solid rgba(203,213,225,0.9)',
+    background: '#0f172a',
+    border: '1px solid #273449',
     borderRadius: 28,
     boxShadow: '0 20px 55px rgba(15,23,42,0.12)',
     display: 'grid',
@@ -199,16 +200,16 @@ const s = {
   },
   rightPanel: {
     alignItems: 'center',
-    background: '#f8fafc',
+    background: '#0b1220',
     display: 'flex',
     justifyContent: 'center',
     padding: 'clamp(24px,4vw,48px)',
   },
   formCard: {
-    background: '#fff',
-    border: '1px solid #e2e8f0',
+    background: '#0f172a',
+    border: '1px solid #273449',
     borderRadius: 20,
-    boxShadow: '0 4px 24px rgba(15,23,42,0.07)',
+    boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
     maxWidth: 440,
     padding: 'clamp(24px,4vw,40px)',
     width: '100%',
@@ -217,7 +218,7 @@ const s = {
     marginBottom: 28,
   },
   formTitle: {
-    color: '#0f172a',
+    color: '#f8fafc',
     fontSize: '1.75rem',
     fontWeight: 800,
     letterSpacing: '-0.03em',
@@ -239,14 +240,14 @@ const s = {
     gap: 6,
   },
   label: {
-    color: '#374151',
+    color: '#cbd5e1',
     fontSize: '0.85rem',
     fontWeight: 600,
   },
   inputWrap: {
     alignItems: 'center',
-    background: '#f8fafc',
-    border: '1.5px solid #e2e8f0',
+    background: '#111c2e',
+    border: '1.5px solid #334155',
     borderRadius: 10,
     display: 'flex',
     gap: 8,
@@ -260,7 +261,7 @@ const s = {
   input: {
     background: 'transparent',
     border: 0,
-    color: '#0f172a',
+    color: '#f1f5f9',
     flex: 1,
     fontSize: '0.95rem',
     minHeight: 44,

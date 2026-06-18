@@ -12,9 +12,9 @@ const Layout = () => (
 
 const s = {
   shell: {
-    background: '#f1f5f9',
+    background: '#070b14',
     boxSizing: 'border-box',
-    color: '#1e293b',
+    color: '#e2e8f0',
     fontFamily: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif",
     minHeight: '100vh',
     overflowX: 'hidden',

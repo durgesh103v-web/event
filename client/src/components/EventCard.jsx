@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 import { memo, useMemo, useState } from 'react';
 
 const CATEGORY_COLORS = {
-  Technology: { bg: '#eff6ff', text: '#1d4ed8', dot: '#3b82f6' },
-  Business:   { bg: '#f0fdf4', text: '#15803d', dot: '#22c55e' },
-  Cloud:      { bg: '#f5f3ff', text: '#6d28d9', dot: '#8b5cf6' },
-  Design:     { bg: '#fdf4ff', text: '#86198f', dot: '#d946ef' },
+  Technology: { bg: '#172554', text: '#93c5fd', dot: '#3b82f6' },
+  Business:   { bg: '#123524', text: '#86efac', dot: '#22c55e' },
+  Cloud:      { bg: '#2e1f5e', text: '#c4b5fd', dot: '#8b5cf6' },
+  Design:     { bg: '#4a174f', text: '#f0abfc', dot: '#d946ef' },
 };
-const defaultCatColor = { bg: '#fff7ed', text: '#ea580c', dot: '#f97316' };
+const defaultCatColor = { bg: '#431f12', text: '#fdba74', dot: '#f97316' };
 
 const getOptimizedImageUrl = (url) => {
   if (!url) return '';
@@ -94,10 +94,10 @@ const EventCard = ({ event }) => {
 
 const s = {
   card: {
-    background: '#fff',
-    border: '1px solid #e2e8f0',
+    background: '#0f172a',
+    border: '1px solid #243247',
     borderRadius: 16,
-    boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.04)',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.22)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
@@ -111,7 +111,7 @@ const s = {
     textDecoration: 'none',
   },
   imgWrap: {
-    background: '#f1f5f9',
+    background: '#111c2e',
     height: 180,
     overflow: 'hidden',
     position: 'relative',
@@ -167,12 +167,12 @@ const s = {
   },
   heartBtn: {
     alignItems: 'center',
-    background: 'rgba(255,255,255,0.9)',
+    background: 'rgba(15,23,42,0.9)',
     backdropFilter: 'blur(8px)',
     border: 0,
     borderRadius: '50%',
     boxShadow: '0 2px 8px rgba(15,23,42,0.12)',
-    color: '#94a3b8',
+    color: '#cbd5e1',
     display: 'flex',
     height: 32,
     justifyContent: 'center',
@@ -183,7 +183,7 @@ const s = {
     width: 32,
   },
   heartBtnActive: {
-    background: '#fff1f2',
+    background: '#3f1725',
     color: '#f43f5e',
   },
   body: {
@@ -194,7 +194,7 @@ const s = {
     padding: '14px 16px 10px',
   },
   title: {
-    color: '#0f172a',
+    color: '#f8fafc',
     fontSize: '1rem',
     fontWeight: 700,
     letterSpacing: '-0.01em',
@@ -202,7 +202,7 @@ const s = {
     margin: 0,
   },
   desc: {
-    color: '#64748b',
+    color: '#94a3b8',
     display: '-webkit-box',
     flex: 1,
     fontSize: '0.85rem',
@@ -220,7 +220,7 @@ const s = {
   },
   metaItem: {
     alignItems: 'center',
-    color: '#64748b',
+    color: '#94a3b8',
     display: 'flex',
     fontSize: '0.78rem',
     fontWeight: 500,
@@ -233,7 +233,7 @@ const s = {
     marginTop: 6,
   },
   capacityBar: {
-    background: '#f1f5f9',
+    background: '#273449',
     borderRadius: 999,
     flex: 1,
     height: 4,
@@ -254,7 +254,7 @@ const s = {
     gap: 3,
   },
   footer: {
-    borderTop: '1px solid #f1f5f9',
+    borderTop: '1px solid #243247',
     display: 'flex',
     justifyContent: 'flex-end',
     padding: '10px 16px',

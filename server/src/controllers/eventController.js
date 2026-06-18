@@ -12,6 +12,7 @@ const normalizeEventBody = (body) => ({
 });
 
 const canManageEvent = (user) => user.role === 'admin';
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const getEvents = async (req, res, next) => {
   try {
@@ -35,7 +36,7 @@ export const getEvents = async (req, res, next) => {
     }
     
     if (req.query.location) {
-      filter.location = req.query.location;
+      filter.location = { $regex: escapeRegex(req.query.location), $options: 'i' };
     }
     
     if (req.query.date) {
@@ -49,6 +50,13 @@ export const getEvents = async (req, res, next) => {
         const endOfWeek = new Date();
         endOfWeek.setDate(startOfDay.getDate() + 7);
         filter.startsAt = { $gte: startOfDay, $lte: endOfWeek };
+      } else if (req.query.date === 'month') {
+        const startOfDay = new Date(now.setHours(0,0,0,0));
+        const endOfMonth = new Date(startOfDay);
+        endOfMonth.setDate(startOfDay.getDate() + 30);
+        filter.startsAt = { $gte: startOfDay, $lte: endOfMonth };
+      } else if (req.query.date === 'online') {
+        filter.location = { $regex: '^Online$', $options: 'i' };
       }
     }
 
