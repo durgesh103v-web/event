@@ -81,6 +81,8 @@ const s = {
     borderRadius: 20,
     boxShadow: '0 10px 28px rgba(0,0,0,0.25)',
     display: 'flex',
+    flexWrap: 'wrap',
+    gap: 16,
     justifyContent: 'space-between',
     padding: 'clamp(20px,3vw,36px)',
   },

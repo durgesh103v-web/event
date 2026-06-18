@@ -80,26 +80,26 @@ const EventsPage = () => {
 
             {/* Stats row */}
             <div style={{ ...s.statsRow, ...(isMobile ? s.statsRowMobile : {}) }}>
-              <div style={s.statCard}>
+              <div style={{ ...s.statCard, ...(isMobile ? s.statCardMobile : {}) }}>
                 <TrendingUp size={18} color="#f97316" />
                 <div>
-                  <strong style={s.statNum}>{pagination.total || 0}</strong>
+                  <strong style={{ ...s.statNum, ...(isMobile ? s.statNumMobile : {}) }}>{pagination.total || 0}</strong>
                   <span style={s.statLabel}>Events</span>
                 </div>
               </div>
               <div style={{ ...s.statDivider, ...(isMobile ? s.statDividerMobile : {}) }} />
-              <div style={s.statCard}>
+              <div style={{ ...s.statCard, ...(isMobile ? s.statCardMobile : {}) }}>
                 <Users size={18} color="#f97316" />
                 <div>
-                  <strong style={s.statNum}>{totalAttendees}</strong>
+                  <strong style={{ ...s.statNum, ...(isMobile ? s.statNumMobile : {}) }}>{totalAttendees}</strong>
                   <span style={s.statLabel}>Attendees</span>
                 </div>
               </div>
               <div style={{ ...s.statDivider, ...(isMobile ? s.statDividerMobile : {}) }} />
-              <div style={s.statCard}>
+              <div style={{ ...s.statCard, ...(isMobile ? s.statCardMobile : {}) }}>
                 <CalendarDays size={18} color="#f97316" />
                 <div>
-                  <strong style={s.statNum}>4+</strong>
+                  <strong style={{ ...s.statNum, ...(isMobile ? s.statNumMobile : {}) }}>4+</strong>
                   <span style={s.statLabel}>Categories</span>
                 </div>
               </div>
@@ -306,11 +306,13 @@ const s = {
     maxWidth: '100%',
     overflowX: 'auto',
   },
-  statsRowMobile: { padding: '12px 14px' },
+  statsRowMobile: { padding: '12px 10px' },
   statCard: { alignItems: 'center', display: 'flex', gap: 10, flexShrink: 0 },
+  statCardMobile: { gap: 6 },
   statDivider: { background: 'rgba(255,255,255,0.1)', height: 28, margin: '0 20px', width: 1, flexShrink: 0 },
-  statDividerMobile: { margin: '0 12px' },
+  statDividerMobile: { margin: '0 8px' },
   statNum: { color: '#f8fafc', display: 'block', fontSize: '1.2rem', fontWeight: 800 },
+  statNumMobile: { fontSize: '1.05rem' },
   statLabel: { color: '#64748b', display: 'block', fontSize: '0.72rem', fontWeight: 600 },
   heroRight: { height: 280, position: 'relative' },
   heroImgFrame: { borderRadius: 16, height: '100%', overflow: 'hidden', position: 'relative', width: '100%' },
