@@ -1,4 +1,9 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import swaggerJsdoc from 'swagger-jsdoc';
+
+const docsDirectory = path.dirname(fileURLToPath(import.meta.url));
+const pathDefinitions = path.join(docsDirectory, 'paths.js').replaceAll('\\', '/');
 
 export const swaggerSpec = swaggerJsdoc({
   definition: {
@@ -56,5 +61,5 @@ export const swaggerSpec = swaggerJsdoc({
       }
     }
   },
-  apis: ['./src/app.js', './src/routes/*.js']
+  apis: [pathDefinitions]
 });

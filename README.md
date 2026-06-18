@@ -29,27 +29,30 @@ MERN Stack technical assignment for Biz Technologies IT Solutions Ltd / Blockcoa
 
 ```text
 .
-├── client
-│   ├── src
-│   │   ├── api
-│   │   ├── components
-│   │   ├── context
-│   │   └── pages
-│   ├── Dockerfile
-│   └── vite.config.js
-├── server
-│   ├── src
-│   │   ├── config
-│   │   ├── controllers
-│   │   ├── docs
-│   │   ├── middleware
-│   │   ├── models
-│   │   ├── routes
-│   │   └── utils
-│   └── Dockerfile
-├── docker-compose.yml
-├── package.json
-└── postman_collection.json
+|-- client
+|   |-- src
+|   |   |-- api          # Axios client and API error handling
+|   |   |-- components   # Reusable UI components
+|   |   |-- constants    # Shared static option data
+|   |   |-- context      # Authentication state
+|   |   |-- hooks        # Shared React hooks
+|   |   |-- pages        # Route-level screens
+|   |   `-- styles       # Global and style helpers
+|   |-- Dockerfile
+|   `-- vite.config.js
+|-- server
+|   |-- src
+|   |   |-- config       # Database configuration
+|   |   |-- controllers  # HTTP request handlers
+|   |   |-- docs         # OpenAPI schemas and paths
+|   |   |-- middleware   # Auth, validation, and errors
+|   |   |-- models       # Mongoose models
+|   |   |-- routes       # Express route definitions
+|   |   `-- utils        # Query and token helpers
+|   `-- Dockerfile
+|-- docker-compose.yml
+|-- package.json
+`-- postman_collection.json
 ```
 
 ## Local Setup
@@ -133,7 +136,7 @@ docker compose exec server npm run seed
 | POST | `/api/auth/register` | Public | Register user |
 | POST | `/api/auth/login` | Public | Login user |
 | GET | `/api/auth/me` | Authenticated | Current user |
-| GET | `/api/events` | Public | List events with `page`, `limit`, `search` |
+| GET | `/api/events` | Public | List events with `page`, `limit`, `search`, `category`, `location`, and `date` filters |
 | GET | `/api/events/:id` | Public | Event details and attendees |
 | GET | `/api/events/:id/attendees` | Public | Registered attendees for event |
 | POST | `/api/events` | Admin | Create event |

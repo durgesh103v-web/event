@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Event from '../models/Event.js';
+import { buildEventFilter } from '../utils/eventQuery.js';
 
 const normalizeEventBody = (body) => ({
   title: body.title,
@@ -12,53 +13,13 @@ const normalizeEventBody = (body) => ({
 });
 
 const canManageEvent = (user) => user.role === 'admin';
-const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const getEvents = async (req, res, next) => {
   try {
     const page = Math.max(Number(req.query.page) || 1, 1);
     const limit = Math.min(Math.max(Number(req.query.limit) || 8, 1), 50);
     const skip = (page - 1) * limit;
-    const search = (req.query.search || '').trim();
-
-    const filter = {};
-    if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { category: { $regex: search, $options: 'i' } },
-        { location: { $regex: search, $options: 'i' } }
-      ];
-    }
-    
-    if (req.query.category) {
-      filter.category = req.query.category;
-    }
-    
-    if (req.query.location) {
-      filter.location = { $regex: escapeRegex(req.query.location), $options: 'i' };
-    }
-    
-    if (req.query.date) {
-      const now = new Date();
-      if (req.query.date === 'today') {
-        const startOfDay = new Date(now.setHours(0,0,0,0));
-        const endOfDay = new Date(now.setHours(23,59,59,999));
-        filter.startsAt = { $gte: startOfDay, $lte: endOfDay };
-      } else if (req.query.date === 'week') {
-        const startOfDay = new Date(now.setHours(0,0,0,0));
-        const endOfWeek = new Date();
-        endOfWeek.setDate(startOfDay.getDate() + 7);
-        filter.startsAt = { $gte: startOfDay, $lte: endOfWeek };
-      } else if (req.query.date === 'month') {
-        const startOfDay = new Date(now.setHours(0,0,0,0));
-        const endOfMonth = new Date(startOfDay);
-        endOfMonth.setDate(startOfDay.getDate() + 30);
-        filter.startsAt = { $gte: startOfDay, $lte: endOfMonth };
-      } else if (req.query.date === 'online') {
-        filter.location = { $regex: '^Online$', $options: 'i' };
-      }
-    }
+    const filter = buildEventFilter(req.query);
 
     const [events, total] = await Promise.all([
       Event.find(filter)

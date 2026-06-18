@@ -1,112 +1,12 @@
-import { Calendar, CalendarDays, Check, ChevronDown, Layers3, MapPin, Search, Users, Sparkles, TrendingUp } from 'lucide-react';
+import { Calendar, CalendarDays, Layers3, MapPin, Search, Users, Sparkles, TrendingUp } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import api, { getErrorMessage } from '../api/client';
 import EventCard from '../components/EventCard';
+import FilterSelect from '../components/FilterSelect';
 import Pagination from '../components/Pagination';
 import StatusMessage from '../components/StatusMessage';
-
-const filterChips = [
-  { label: 'All', value: '' },
-  { label: 'Blockchain', value: 'Blockchain' },
-  { label: 'Web3', value: 'Web3' },
-  { label: 'DeFi', value: 'DeFi' },
-  { label: 'Ethereum', value: 'Ethereum' },
-  { label: 'NFT', value: 'NFT' },
-  { label: 'Technology', value: 'Technology' },
-  { label: 'Business', value: 'Business' },
-  { label: 'Cloud', value: 'Cloud' },
-  { label: 'Frontend', value: 'Frontend' },
-  { label: 'Backend', value: 'Backend' },
-  { label: 'Database', value: 'Database' },
-  { label: 'Design', value: 'Design' },
-  { label: 'Security', value: 'Security' },
-  { label: 'DevOps', value: 'DevOps' },
-  { label: 'AI', value: 'AI' },
-  { label: 'Mobile', value: 'Mobile' },
-  { label: 'Engineering', value: 'Engineering' },
-];
-
-const locationOptions = [
-  'Online', 'Mumbai', 'Powai', 'Bandra', 'Andheri', 'Lower Parel',
-  'Thane', 'Navi Mumbai', 'Pune', 'Bengaluru', 'Hyderabad', 'Delhi',
-];
-
-const locationFilterOptions = [
-  { label: 'All Locations', value: '' },
-  ...locationOptions.map(item => ({ label: item, value: item })),
-];
-
-const dateOptions = [
-  { label: 'Any Date', value: '' },
-  { label: 'Today', value: 'today' },
-  { label: 'This Week', value: 'week' },
-  { label: 'This Month', value: 'month' },
-  { label: 'Online Events', value: 'online' },
-];
-
-const FilterSelect = ({ ariaLabel, onChange, options, value }) => {
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef(null);
-  const selected = options.find(option => option.value === value) || options[0];
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const closeMenu = (event) => {
-      if (!menuRef.current?.contains(event.target)) setOpen(false);
-    };
-    document.addEventListener('mousedown', closeMenu);
-    return () => document.removeEventListener('mousedown', closeMenu);
-  }, [open]);
-
-  return (
-    <div ref={menuRef} style={s.filterSelect}>
-      <button
-        aria-expanded={open}
-        aria-haspopup="listbox"
-        aria-label={ariaLabel}
-        onClick={() => setOpen(current => !current)}
-        onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false); }}
-        style={s.filterTrigger}
-        type="button"
-      >
-        <span style={s.filterValue}>{selected.label}</span>
-        <ChevronDown size={16} style={{ ...s.filterChevron, ...(open ? s.filterChevronOpen : {}) }} />
-      </button>
-
-      {open && (
-        <div aria-label={`${ariaLabel} options`} role="listbox" style={s.filterMenu}>
-          {options.map(option => {
-            const active = option.value === value;
-            return (
-              <button
-                aria-selected={active}
-                key={option.value}
-                onClick={() => { onChange(option.value); setOpen(false); }}
-                role="option"
-                style={{ ...s.filterOption, ...(active ? s.filterOptionActive : {}) }}
-                type="button"
-              >
-                <span>{option.label}</span>
-                {active && <Check size={14} color="#fb923c" />}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const useMediaQuery = (query) => {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
-  useEffect(() => {
-    const mq = window.matchMedia(query);
-    const h = (e) => setMatches(e.matches);
-    mq.addEventListener('change', h);
-    return () => mq.removeEventListener('change', h);
-  }, [query]);
-  return matches;
-};
+import { CATEGORY_FILTER_OPTIONS, DATE_FILTER_OPTIONS, LOCATION_FILTER_OPTIONS } from '../constants/eventFilters';
+import useMediaQuery from '../hooks/useMediaQuery';
 
 const EventsPage = () => {
   const isTablet = useMediaQuery('(max-width: 900px)');
@@ -255,7 +155,7 @@ const EventsPage = () => {
             <FilterSelect
               ariaLabel="Category"
               onChange={(value) => { setCategory(value); fetchEvents(1, query, value, location, date); }}
-              options={filterChips}
+              options={CATEGORY_FILTER_OPTIONS}
               value={category}
             />
           </div>
@@ -265,7 +165,7 @@ const EventsPage = () => {
             <FilterSelect
               ariaLabel="Location"
               onChange={(value) => { setLocation(value); fetchEvents(1, query, category, value, date); }}
-              options={locationFilterOptions}
+              options={LOCATION_FILTER_OPTIONS}
               value={location}
             />
           </div>
@@ -275,7 +175,7 @@ const EventsPage = () => {
             <FilterSelect
               ariaLabel="Date"
               onChange={(value) => { setDate(value); fetchEvents(1, query, category, location, value); }}
-              options={dateOptions}
+              options={DATE_FILTER_OPTIONS}
               value={date}
             />
           </div>
@@ -469,72 +369,6 @@ const s = {
     outline: 'none',
     fontFamily: 'inherit',
   },
-  fieldSelect: {
-    background: 'transparent',
-    border: 0,
-    color: '#f1f5f9',
-    cursor: 'pointer',
-    flex: 1,
-    fontSize: '0.9rem',
-    minWidth: 0,
-    outline: 'none',
-    fontFamily: 'inherit',
-  },
-  filterSelect: { flex: 1, minWidth: 0, position: 'relative' },
-  filterTrigger: {
-    alignItems: 'center',
-    background: 'transparent',
-    border: 0,
-    color: '#f1f5f9',
-    display: 'flex',
-    fontFamily: 'inherit',
-    fontSize: '0.9rem',
-    gap: 8,
-    justifyContent: 'space-between',
-    minHeight: 28,
-    padding: 0,
-    textAlign: 'left',
-    width: '100%',
-  },
-  filterValue: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  filterChevron: { color: '#cbd5e1', flexShrink: 0, transition: 'transform 0.18s ease' },
-  filterChevronOpen: { transform: 'rotate(180deg)' },
-  filterMenu: {
-    background: '#0f172a',
-    border: '1px solid #334155',
-    borderRadius: 12,
-    boxShadow: '0 18px 45px rgba(0,0,0,0.45)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 2,
-    left: -10,
-    marginTop: 10,
-    maxHeight: 280,
-    minWidth: 210,
-    overflowY: 'auto',
-    padding: 6,
-    position: 'absolute',
-    right: -8,
-    top: '100%',
-    zIndex: 50,
-  },
-  filterOption: {
-    alignItems: 'center',
-    background: 'transparent',
-    border: 0,
-    borderRadius: 8,
-    color: '#cbd5e1',
-    display: 'flex',
-    flexShrink: 0,
-    fontFamily: 'inherit',
-    fontSize: '0.86rem',
-    justifyContent: 'space-between',
-    minHeight: 36,
-    padding: '8px 10px',
-    textAlign: 'left',
-    width: '100%',
-  },
-  filterOptionActive: { background: 'rgba(249,115,22,0.12)', color: '#fb923c', fontWeight: 700 },
   sep: { background: '#273449', flexShrink: 0, height: 28, width: 1 },
   searchBtn: {
     alignItems: 'center',
