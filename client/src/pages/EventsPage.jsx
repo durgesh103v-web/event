@@ -1,20 +1,32 @@
-import { Calendar, CalendarDays, Layers3, MapPin, Search, Users } from 'lucide-react';
+import { Calendar, CalendarDays, Layers3, MapPin, Search, Users, Sparkles, TrendingUp } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import api, { getErrorMessage } from '../api/client';
 import EventCard from '../components/EventCard';
 import Pagination from '../components/Pagination';
 import StatusMessage from '../components/StatusMessage';
-import { StyleSheet } from '../styles/StyleSheet';
 
 const filterChips = [
-  { label: 'All Categories', value: '' },
+  { label: 'All', value: '' },
   { label: 'Technology', value: 'Technology' },
   { label: 'Business', value: 'Business' },
   { label: 'Cloud', value: 'Cloud' },
-  { label: 'Design', value: 'Design' }
+  { label: 'Design', value: 'Design' },
 ];
 
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const h = (e) => setMatches(e.matches);
+    mq.addEventListener('change', h);
+    return () => mq.removeEventListener('change', h);
+  }, [query]);
+  return matches;
+};
+
 const EventsPage = () => {
+  const isTablet = useMediaQuery('(max-width: 900px)');
+  const isMobile = useMediaQuery('(max-width: 600px)');
   const [events, setEvents] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [search, setSearch] = useState('');
@@ -24,36 +36,20 @@ const EventsPage = () => {
   const [date, setDate] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const abortControllerRef = useRef(null);
-  const activeAttendees = events.reduce(
-    (total, event) => total + (event.attendeeCount || event.attendees?.length || 0),
-    0
-  );
+  const abortRef = useRef(null);
 
-  const fetchEvents = async (
-    page = 1,
-    nextQuery = query,
-    nextCategory = category,
-    nextLocation = location,
-    nextDate = date
-  ) => {
-    abortControllerRef.current?.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
+  const totalAttendees = events.reduce((t, e) => t + (e.attendeeCount || e.attendees?.length || 0), 0);
+
+  const fetchEvents = async (page = 1, nq = query, nc = category, nl = location, nd = date) => {
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     setLoading(true);
     setError('');
-
     try {
       const { data } = await api.get('/events', {
-        signal: controller.signal,
-        params: {
-          page,
-          limit: 12,
-          search: nextQuery,
-          category: nextCategory || undefined,
-          location: nextLocation || undefined,
-          date: nextDate || undefined
-        }
+        signal: ctrl.signal,
+        params: { page, limit: 10, search: nq, category: nc || undefined, location: nl || undefined, date: nd || undefined },
       });
       setEvents(data.data);
       setPagination(data.pagination);
@@ -61,412 +57,405 @@ const EventsPage = () => {
       if (err.name === 'CanceledError' || err.code === 'ERR_CANCELED') return;
       setError(getErrorMessage(err));
     } finally {
-      if (abortControllerRef.current === controller) {
-        setLoading(false);
-      }
+      if (abortRef.current === ctrl) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchEvents(1, '', '', '', '');
-    return () => abortControllerRef.current?.abort();
+    return () => abortRef.current?.abort();
   }, []);
 
-  const handleSearch = (event) => {
-    event.preventDefault();
+  const handleSearch = (e) => {
+    e.preventDefault();
     setQuery(search);
     fetchEvents(1, search, category, location, date);
   };
 
-  const handleCategoryChange = (e) => {
-    const val = e.target.value;
-    setCategory(val);
-    fetchEvents(1, query, val, location, date);
-  };
-
-  const handleLocationChange = (e) => {
-    const val = e.target.value;
-    setLocation(val);
-    fetchEvents(1, query, category, val, date);
-  };
-
-  const handleDateChange = (e) => {
-    const val = e.target.value;
-    setDate(val);
-    fetchEvents(1, query, category, location, val);
-  };
-
   return (
-    <section style={styles.page}>
-      <div style={styles.hero}>
-        <div style={styles.heroContent}>
-          <span style={styles.heroBadge}>Biz Technologies Assignment</span>
-          <h1 style={styles.heroTitle}>
-            Event Management System<br/>
-            <span style={styles.textHighlight}>MERN Stack Role</span>
-          </h1>
-          <p style={styles.heroSubtitle}>
-            Find events that inspire you. Explore upcoming meetups, workshops, and sessions. Register quickly and track your joined events seamlessly.
-          </p>
-          
-          <div style={styles.heroFeatures}>
-            <div style={styles.featureItem}>
-              <div style={styles.featureIcon}><Search size={18} /></div>
-              <span style={styles.featureText}>Discover</span>
-            </div>
-            <div style={styles.featureItem}>
-              <div style={styles.featureIcon}><Users size={18} /></div>
-              <span style={styles.featureText}>Register</span>
-            </div>
-            <div style={styles.featureItem}>
-              <div style={styles.featureIcon}><CalendarDays size={18} /></div>
-              <span style={styles.featureText}>Manage</span>
-            </div>
-          </div>
-        </div>
+    <section style={s.page}>
+      {/* Hero */}
+      <div style={{ ...s.hero, ...(isMobile ? s.heroMobile : {}) }}>
+        <div style={s.heroGlow} />
+        <div style={s.heroGlow2} />
 
-        <div style={styles.heroImageWrapper}>
-          <div style={styles.heroImageFrame}>
-            <img
-              src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=760&q=80"
-              alt="Audience at an event"
-              decoding="async"
-              fetchPriority="high"
-              style={styles.heroImage}
-            />
-          </div>
-          <div style={styles.floatingStat}>
-            <div style={styles.statIcon}><Users size={24} /></div>
-            <div style={styles.statText}>
-              <strong style={styles.statValue}>{activeAttendees}</strong>
-              <span style={styles.statLabel}>Registered Attendees</span>
+        <div style={{ ...s.heroGrid, ...(isTablet ? s.heroGridTablet : {}) }}>
+          {/* Left content */}
+          <div style={s.heroLeft}>
+            <span style={s.heroBadge}>
+              <Sparkles size={12} />
+              Event Management Platform
+            </span>
+            <h1 style={{ ...s.heroTitle, ...(isMobile ? s.heroTitleMobile : {}) }}>
+              Find events that<br />
+              <span style={s.heroAccent}>inspire you.</span>
+            </h1>
+            <p style={s.heroSub}>
+              Explore upcoming meetups, workshops, and conferences. Register in seconds and track everything in one place.
+            </p>
+
+            {/* Stats row */}
+            <div style={s.statsRow}>
+              <div style={s.statCard}>
+                <TrendingUp size={18} color="#f97316" />
+                <div>
+                  <strong style={s.statNum}>{pagination.total || 0}</strong>
+                  <span style={s.statLabel}>Events</span>
+                </div>
+              </div>
+              <div style={s.statDivider} />
+              <div style={s.statCard}>
+                <Users size={18} color="#f97316" />
+                <div>
+                  <strong style={s.statNum}>{totalAttendees}</strong>
+                  <span style={s.statLabel}>Attendees</span>
+                </div>
+              </div>
+              <div style={s.statDivider} />
+              <div style={s.statCard}>
+                <CalendarDays size={18} color="#f97316" />
+                <div>
+                  <strong style={s.statNum}>4+</strong>
+                  <span style={s.statLabel}>Categories</span>
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* Right image */}
+          {!isMobile && (
+            <div style={s.heroRight}>
+              <div style={s.heroImgFrame}>
+                <img
+                  alt="Event audience"
+                  decoding="async"
+                  fetchPriority="high"
+                  src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80"
+                  style={s.heroImg}
+                />
+                <div style={s.heroImgOverlay} />
+              </div>
+              {/* Floating card */}
+              <div style={s.floatCard}>
+                <div style={s.floatIconWrap}><CalendarDays size={16} color="#fff" /></div>
+                <div>
+                  <div style={s.floatTitle}>Next event</div>
+                  <div style={s.floatSub}>Starts soon →</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <div style={styles.searchPanel}>
-        <form style={styles.searchForm} onSubmit={handleSearch}>
-          <div style={{ ...styles.searchField, ...styles.mainSearch }}>
-            <Search size={20} color="#64748b" />
+      {/* Search bar */}
+      <div style={s.searchWrap}>
+        <form
+          style={{ ...s.searchForm, ...(isTablet ? s.searchFormTablet : {}), ...(isMobile ? s.searchFormMobile : {}) }}
+          onSubmit={handleSearch}
+        >
+          <div style={{ ...s.field, flex: '2 1 0' }}>
+            <Search size={17} color="#94a3b8" />
             <input
               aria-label="Search events"
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by keyword..."
-              style={styles.input}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search events..."
+              style={s.fieldInput}
               value={search}
             />
           </div>
-          <div style={styles.divider} />
-          <div style={styles.searchField}>
-            <Layers3 size={20} color="#64748b" />
-            <select aria-label="Category" style={styles.select} value={category} onChange={handleCategoryChange}>
-              {filterChips.map(chip => (
-                <option key={chip.label} value={chip.value}>{chip.label}</option>
-              ))}
+          {!isTablet && <div style={s.sep} />}
+          <div style={s.field}>
+            <Layers3 size={17} color="#94a3b8" />
+            <select aria-label="Category" style={s.fieldSelect} value={category} onChange={(e) => { setCategory(e.target.value); fetchEvents(1, query, e.target.value, location, date); }}>
+              {filterChips.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
-          <div style={styles.divider} />
-          <div style={styles.searchField}>
-            <MapPin size={20} color="#64748b" />
-            <select aria-label="Location" style={styles.select} value={location} onChange={handleLocationChange}>
+          {!isTablet && <div style={s.sep} />}
+          <div style={s.field}>
+            <MapPin size={17} color="#94a3b8" />
+            <select aria-label="Location" style={s.fieldSelect} value={location} onChange={(e) => { setLocation(e.target.value); fetchEvents(1, query, category, e.target.value, date); }}>
               <option value="">All Locations</option>
               <option value="Online">Online</option>
               <option value="Mumbai">Mumbai</option>
               <option value="Bengaluru">Bengaluru</option>
             </select>
           </div>
-          <div style={styles.divider} />
-          <div style={styles.searchField}>
-            <Calendar size={20} color="#64748b" />
-            <select aria-label="Date" style={styles.select} value={date} onChange={handleDateChange}>
+          {!isTablet && <div style={s.sep} />}
+          <div style={s.field}>
+            <Calendar size={17} color="#94a3b8" />
+            <select aria-label="Date" style={s.fieldSelect} value={date} onChange={(e) => { setDate(e.target.value); fetchEvents(1, query, category, location, e.target.value); }}>
               <option value="">Any Date</option>
               <option value="today">Today</option>
               <option value="week">This Week</option>
             </select>
           </div>
-          <button type="submit" style={styles.searchButton}>Search Events</button>
+          <button type="submit" style={s.searchBtn}>
+            <Search size={16} />
+            {!isMobile && 'Search'}
+          </button>
         </form>
       </div>
 
       <StatusMessage type="error">{error}</StatusMessage>
 
-      <div style={styles.sectionHeading}>
+      {/* Section heading */}
+      <div style={s.sectionHead}>
         <div>
-          <h2 style={styles.sectionTitle}>Featured Events</h2>
-          <p style={styles.sectionSubtitle}>Handpicked events you won't want to miss.</p>
+          <h2 style={s.sectionTitle}>Featured Events</h2>
+          <p style={s.sectionSub}>Handpicked events you won't want to miss.</p>
         </div>
+        {pagination.total > 0 && (
+          <span style={s.totalBadge}>{pagination.total} results</span>
+        )}
       </div>
 
       {loading && !events.length ? (
-        <div style={styles.emptyState}>Loading events...</div>
+        <div style={s.empty}>
+          <div style={s.loadingDots}>
+            <span style={{ ...s.dot, animationDelay: '0ms' }} />
+            <span style={{ ...s.dot, animationDelay: '160ms' }} />
+            <span style={{ ...s.dot, animationDelay: '320ms' }} />
+          </div>
+          <p>Loading events...</p>
+        </div>
       ) : events.length ? (
         <>
-          <div style={{ ...styles.eventGrid, ...(loading ? styles.eventGridUpdating : null) }} aria-busy={loading}>
-            {events.map((event) => (
-              <EventCard event={event} key={event._id} />
-            ))}
+          <div
+            style={{ ...s.grid, ...(isMobile ? s.gridMobile : {}), ...(loading ? s.gridLoading : {}) }}
+            aria-busy={loading}
+          >
+            {events.map((event) => <EventCard event={event} key={event._id} />)}
           </div>
           <Pagination pagination={pagination} onPageChange={fetchEvents} />
         </>
       ) : (
-        <div style={styles.emptyState}>No events found.</div>
+        <div style={s.empty}>
+          <Search size={32} color="#cbd5e1" />
+          <p style={{ margin: '8px 0 0', color: '#64748b' }}>No events found. Try adjusting your filters.</p>
+        </div>
       )}
     </section>
   );
 };
 
-const styles = StyleSheet.create({
-  page: {
-    boxSizing: 'border-box',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 32,
-    paddingBottom: 60,
-    width: '100%'
-  },
+const s = {
+  page: { display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 48, width: '100%' },
   hero: {
-    alignItems: 'center',
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 16,
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+    borderRadius: 20,
     boxSizing: 'border-box',
-    display: 'grid',
-    gap: 32,
-    gridTemplateColumns: '1fr 1fr',
-    margin: '0 auto',
-    maxWidth: 1200,
     overflow: 'hidden',
-    padding: '48px 48px',
+    padding: 'clamp(28px,4vw,52px)',
+    position: 'relative',
     width: '100%',
-    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)'
   },
-  heroContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16,
-    zIndex: 2
+  heroMobile: { padding: '24px 18px' },
+  heroGlow: {
+    background: 'radial-gradient(ellipse at 15% 50%, rgba(249,115,22,0.22) 0%, transparent 60%)',
+    inset: 0,
+    pointerEvents: 'none',
+    position: 'absolute',
   },
+  heroGlow2: {
+    background: 'radial-gradient(ellipse at 85% 50%, rgba(59,130,246,0.1) 0%, transparent 60%)',
+    inset: 0,
+    pointerEvents: 'none',
+    position: 'absolute',
+  },
+  heroGrid: {
+    alignItems: 'center',
+    display: 'grid',
+    gap: 'clamp(24px,4vw,56px)',
+    gridTemplateColumns: '1fr 1fr',
+    position: 'relative',
+    zIndex: 2,
+  },
+  heroGridTablet: { gridTemplateColumns: '1fr' },
+  heroLeft: { display: 'flex', flexDirection: 'column', gap: 20 },
   heroBadge: {
-    background: '#fff7ed',
-    border: '1px solid #fdba74',
+    alignItems: 'center',
+    background: 'rgba(249,115,22,0.15)',
+    border: '1px solid rgba(249,115,22,0.3)',
     borderRadius: 999,
-    color: '#ea580c',
-    display: 'inline-block',
-    fontSize: '0.75rem',
+    color: '#fb923c',
+    display: 'inline-flex',
+    fontSize: '0.72rem',
     fontWeight: 700,
+    gap: 5,
     letterSpacing: '0.05em',
-    padding: '4px 12px',
+    padding: '5px 12px',
     textTransform: 'uppercase',
-    alignSelf: 'flex-start'
+    width: 'fit-content',
   },
   heroTitle: {
-    color: '#0f172a',
-    fontSize: '3rem',
-    fontWeight: 800,
-    lineHeight: 1.1,
-    margin: 0
-  },
-  textHighlight: {
-    color: '#ea580c'
-  },
-  heroSubtitle: {
-    color: '#475569',
-    fontSize: '1.1rem',
-    lineHeight: 1.6,
+    color: '#f8fafc',
+    fontSize: 'clamp(2rem,3.5vw,3.2rem)',
+    fontWeight: 900,
+    letterSpacing: '-0.04em',
+    lineHeight: 1.05,
     margin: 0,
-    maxWidth: 480
   },
-  heroFeatures: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 16
+  heroTitleMobile: { fontSize: '1.9rem' },
+  heroAccent: {
+    background: 'linear-gradient(90deg, #f97316, #fb923c)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
   },
-  featureItem: {
+  heroSub: { color: '#94a3b8', fontSize: '0.97rem', lineHeight: 1.6, margin: 0, maxWidth: 480 },
+  statsRow: {
     alignItems: 'center',
-    background: '#f8fafc',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 14,
     display: 'flex',
-    gap: 8,
-    padding: '8px 12px'
+    gap: 0,
+    padding: '14px 20px',
+    width: 'fit-content',
   },
-  featureIcon: {
-    color: '#ea580c',
-    display: 'flex'
-  },
-  featureText: {
-    color: '#1e293b',
-    fontSize: '0.9rem',
-    fontWeight: 600
-  },
-  heroImageWrapper: {
-    height: 380,
-    minWidth: 0,
-    position: 'relative',
-    width: '100%'
-  },
-  heroImageFrame: {
-    borderRadius: 16,
-    height: '100%',
-    overflow: 'hidden',
-    width: '100%'
-  },
-  heroImage: {
-    height: '100%',
-    objectFit: 'cover',
-    width: '100%'
-  },
-  floatingStat: {
-    alignItems: 'center',
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 12,
-    bottom: -20,
-    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-    display: 'flex',
-    gap: 12,
-    padding: '12px 16px',
+  statCard: { alignItems: 'center', display: 'flex', gap: 10 },
+  statDivider: { background: 'rgba(255,255,255,0.1)', height: 28, margin: '0 20px', width: 1 },
+  statNum: { color: '#f8fafc', display: 'block', fontSize: '1.2rem', fontWeight: 800 },
+  statLabel: { color: '#64748b', display: 'block', fontSize: '0.72rem', fontWeight: 600 },
+  heroRight: { height: 280, position: 'relative' },
+  heroImgFrame: { borderRadius: 16, height: '100%', overflow: 'hidden', position: 'relative', width: '100%' },
+  heroImg: { height: '100%', objectFit: 'cover', objectPosition: 'center 40%', width: '100%' },
+  heroImgOverlay: {
+    background: 'linear-gradient(to bottom, transparent 50%, rgba(15,23,42,0.5))',
+    inset: 0,
     position: 'absolute',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    zIndex: 3,
-    whiteSpace: 'nowrap'
   },
-  statIcon: {
+  floatCard: {
     alignItems: 'center',
-    background: '#ea580c',
-    borderRadius: '50%',
-    color: '#ffffff',
-    display: 'flex',
-    height: 40,
-    justifyContent: 'center',
-    width: 40
-  },
-  statText: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  statValue: {
-    color: '#0f172a',
-    fontSize: '1.25rem',
-    fontWeight: 800,
-    lineHeight: 1.1
-  },
-  statLabel: {
-    color: '#64748b',
-    fontSize: '0.8rem',
-    fontWeight: 600
-  },
-  searchPanel: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
+    backdropFilter: 'blur(12px)',
+    background: 'rgba(15,23,42,0.8)',
+    border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: 12,
-    boxSizing: 'border-box',
-    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)',
-    margin: '-16px auto 0',
-    maxWidth: 1000,
-    padding: 8,
-    width: '100%',
-    position: 'relative',
-    zIndex: 10
-  },
-  searchForm: {
-    alignItems: 'center',
+    bottom: 14,
+    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
     display: 'flex',
-    flexWrap: 'nowrap',
-    width: '100%',
-    gap: 8
+    gap: 10,
+    left: 14,
+    padding: '10px 14px',
+    position: 'absolute',
   },
-  searchField: {
+  floatIconWrap: {
     alignItems: 'center',
-    boxSizing: 'border-box',
-    display: 'flex',
-    flex: '1 1 auto',
-    gap: 8,
-    padding: '8px 16px'
-  },
-  mainSearch: {
-    flex: '2 1 auto'
-  },
-  divider: {
-    width: 1,
-    height: 32,
-    backgroundColor: '#e2e8f0'
-  },
-  input: {
-    background: 'transparent',
-    border: 0,
-    color: '#0f172a',
-    fontSize: '0.95rem',
-    outline: 'none',
-    width: '100%',
-    fontFamily: 'inherit'
-  },
-  select: {
-    background: 'transparent',
-    border: 0,
-    color: '#0f172a',
-    cursor: 'pointer',
-    fontSize: '0.95rem',
-    outline: 'none',
-    width: '100%',
-    fontFamily: 'inherit'
-  },
-  searchButton: {
-    alignSelf: 'stretch',
-    background: '#ea580c',
-    border: 0,
+    background: 'linear-gradient(135deg,#f97316,#ea580c)',
     borderRadius: 8,
-    color: '#ffffff',
-    cursor: 'pointer',
-    flex: '0 0 auto',
-    fontWeight: 600,
-    padding: '0 24px',
-    whiteSpace: 'nowrap',
-    transition: 'background-color 0.2s ease'
+    display: 'flex',
+    height: 32,
+    justifyContent: 'center',
+    width: 32,
   },
-  sectionHeading: {
-    maxWidth: 1200,
-    margin: '0 auto',
-    width: '100%'
+  floatTitle: { color: '#f8fafc', fontSize: '0.8rem', fontWeight: 700 },
+  floatSub: { color: '#64748b', fontSize: '0.72rem' },
+  searchWrap: {
+    background: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 14,
+    boxShadow: '0 4px 12px rgba(15,23,42,0.06)',
+    padding: 6,
+    width: '100%',
   },
-  sectionTitle: {
+  searchForm: { alignItems: 'center', display: 'flex', gap: 0, width: '100%' },
+  searchFormTablet: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4, padding: 4 },
+  searchFormMobile: { gridTemplateColumns: '1fr' },
+  field: {
+    alignItems: 'center',
+    display: 'flex',
+    flex: '1 1 0',
+    gap: 8,
+    minWidth: 0,
+    padding: '8px 14px',
+  },
+  fieldInput: {
+    background: 'transparent',
+    border: 0,
     color: '#0f172a',
-    fontSize: '1.75rem',
-    fontWeight: 800,
-    margin: '0 0 4px'
+    flex: 1,
+    fontSize: '0.9rem',
+    minWidth: 0,
+    outline: 'none',
+    fontFamily: 'inherit',
   },
-  sectionSubtitle: {
-    color: '#64748b',
-    fontSize: '1rem',
-    margin: 0
+  fieldSelect: {
+    background: 'transparent',
+    border: 0,
+    color: '#0f172a',
+    cursor: 'pointer',
+    flex: 1,
+    fontSize: '0.9rem',
+    minWidth: 0,
+    outline: 'none',
+    fontFamily: 'inherit',
   },
-  eventGrid: {
-    boxSizing: 'border-box',
+  sep: { background: '#f1f5f9', flexShrink: 0, height: 28, width: 1 },
+  searchBtn: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    background: 'linear-gradient(135deg,#f97316,#ea580c)',
+    border: 0,
+    borderRadius: 10,
+    boxShadow: '0 2px 8px rgba(234,88,12,0.3)',
+    color: '#fff',
+    cursor: 'pointer',
+    display: 'flex',
+    flex: '0 0 auto',
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    gap: 6,
+    padding: '0 20px',
+    whiteSpace: 'nowrap',
+  },
+  sectionHead: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  sectionTitle: { color: '#0f172a', fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', margin: '0 0 2px' },
+  sectionSub: { color: '#64748b', fontSize: '0.87rem', margin: 0 },
+  totalBadge: {
+    background: '#f1f5f9',
+    border: '1px solid #e2e8f0',
+    borderRadius: 999,
+    color: '#475569',
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    padding: '4px 12px',
+  },
+  grid: {
     display: 'grid',
-    gap: 24,
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    margin: '0 auto',
-    maxWidth: 1200,
-    width: '100%'
+    gap: 18,
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))',
+    width: '100%',
   },
-  eventGridUpdating: {
-    opacity: 0.6,
-    pointerEvents: 'none'
-  },
-  emptyState: {
-    background: '#ffffff',
-    border: '1px dashed #cbd5e1',
-    borderRadius: 12,
-    color: '#64748b',
-    margin: '0 auto',
-    maxWidth: 1200,
-    padding: '48px 24px',
+  gridMobile: { gridTemplateColumns: '1fr' },
+  gridLoading: { opacity: 0.55, pointerEvents: 'none', transition: 'opacity 0.2s' },
+  empty: {
+    alignItems: 'center',
+    background: '#fff',
+    border: '1.5px dashed #e2e8f0',
+    borderRadius: 16,
+    color: '#94a3b8',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+    padding: '56px 24px',
     textAlign: 'center',
-    width: '100%'
-  }
-});
+    width: '100%',
+  },
+  loadingDots: { display: 'flex', gap: 6 },
+  dot: {
+    animation: 'pulse 1s ease-in-out infinite',
+    background: '#f97316',
+    borderRadius: '50%',
+    display: 'inline-block',
+    height: 8,
+    width: 8,
+  },
+};
 
 export default EventsPage;

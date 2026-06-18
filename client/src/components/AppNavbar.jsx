@@ -1,227 +1,315 @@
-import { CalendarDays, LogOut, Plus, UserRound } from 'lucide-react';
+import { CalendarDays, LogOut, Plus, UserRound, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { StyleSheet } from '../styles/StyleSheet';
 
 const AppNavbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
-
-  const getInitials = (name = '') =>
-    name
-      .split(' ')
-      .map((item) => item[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinkStyle = ({ isActive }) => ({
-    ...styles.navLink,
-    ...(isActive ? styles.navLinkActive : null)
-  });
-
-  const authLinkStyle = ({ isActive }) => ({
-    ...styles.loginLink,
-    ...(isActive ? styles.loginLinkActive : null)
+    ...s.navLink,
+    ...(isActive ? s.navLinkActive : {})
   });
 
   return (
-    <header style={styles.navbar}>
-      <div style={styles.inner}>
-        <Link style={styles.brand} to="/">
-          <span style={styles.brandIcon}>
-            <CalendarDays size={20} />
+    <header style={s.navbar}>
+      <div style={s.inner}>
+        {/* Brand */}
+        <Link style={s.brand} to="/">
+          <span style={s.brandIcon}>
+            <CalendarDays size={18} />
           </span>
-          <span style={styles.brandText}>EventHub</span>
+          <span style={s.brandText}>EventHub</span>
         </Link>
 
-        <nav aria-label="Primary navigation" style={styles.links}>
-          <NavLink style={navLinkStyle} to="/">
-            Events
-          </NavLink>
-
+        {/* Desktop nav */}
+        <nav style={s.links}>
+          <NavLink style={navLinkStyle} to="/">Events</NavLink>
           {isAuthenticated && (
-            <NavLink style={navLinkStyle} to="/my-registrations">
-              My Events
-            </NavLink>
+            <NavLink style={navLinkStyle} to="/my-registrations">My Events</NavLink>
           )}
-
           {user?.role === 'admin' && (
             <NavLink style={navLinkStyle} to="/events/new">
-              <Plus size={15} />
+              <Plus size={14} strokeWidth={2.5} />
               <span>Create</span>
             </NavLink>
           )}
         </nav>
 
-        <div style={styles.actions}>
+        {/* Desktop actions */}
+        <div style={s.actions}>
           {isAuthenticated ? (
             <>
-              <div style={styles.userNavInfo}>
-                <UserRound size={16} color="#ea580c" />
-                <span>Hi, <strong style={{color: '#0f172a'}}>{user?.name}</strong></span>
+              <div style={s.userChip}>
+                <div style={s.avatar}>
+                  {user?.name?.[0]?.toUpperCase() || <UserRound size={14} />}
+                </div>
+                <span style={s.userName}>{user?.name}</span>
               </div>
-
-              <button onClick={logout} style={styles.logoutButton} type="button">
+              <button onClick={logout} style={s.logoutBtn} type="button">
                 <LogOut size={15} />
-                <span>Logout</span>
+                Logout
               </button>
             </>
           ) : (
             <>
-              <NavLink style={authLinkStyle} to="/login">
-                Login
+              <NavLink style={({ isActive }) => ({ ...s.loginLink, ...(isActive ? s.loginLinkActive : {}) })} to="/login">
+                Sign in
               </NavLink>
-              <NavLink style={styles.registerLink} to="/register">
-                Register
-              </NavLink>
+              <NavLink style={s.registerBtn} to="/register">Get started</NavLink>
             </>
           )}
         </div>
+
+        {/* Mobile toggle */}
+        <button
+          style={s.mobileToggle}
+          onClick={() => setMobileOpen(o => !o)}
+          type="button"
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div style={s.mobileMenu}>
+          <NavLink style={s.mobileLink} to="/" onClick={() => setMobileOpen(false)}>Events</NavLink>
+          {isAuthenticated && (
+            <NavLink style={s.mobileLink} to="/my-registrations" onClick={() => setMobileOpen(false)}>My Events</NavLink>
+          )}
+          {user?.role === 'admin' && (
+            <NavLink style={s.mobileLink} to="/events/new" onClick={() => setMobileOpen(false)}>+ Create Event</NavLink>
+          )}
+          <div style={s.mobileDivider} />
+          {isAuthenticated ? (
+            <button onClick={() => { logout(); setMobileOpen(false); }} style={s.mobileLogout} type="button">
+              <LogOut size={16} /> Logout
+            </button>
+          ) : (
+            <div style={s.mobileAuthRow}>
+              <Link style={s.mobileLoginLink} to="/login" onClick={() => setMobileOpen(false)}>Sign in</Link>
+              <Link style={s.mobileRegisterBtn} to="/register" onClick={() => setMobileOpen(false)}>Get started</Link>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 };
 
-const styles = StyleSheet.create({
+const s = {
   navbar: {
-    background: '#ffffff',
+    background: 'rgba(255,255,255,0.95)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
     borderBottom: '1px solid #e2e8f0',
-    boxSizing: 'border-box',
+    boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
     position: 'sticky',
     top: 0,
     width: '100%',
-    zIndex: 60
+    zIndex: 100,
   },
   inner: {
     alignItems: 'center',
-    boxSizing: 'border-box',
     display: 'flex',
-    gap: 18,
+    gap: 12,
     justifyContent: 'space-between',
-    minHeight: 64,
-    padding: '0 clamp(16px, 3vw, 48px)',
+    margin: '0 auto',
+    maxWidth: 1400,
+    minHeight: 60,
+    padding: '0 clamp(16px,2.5vw,36px)',
     width: '100%',
-    maxWidth: 1200,
-    margin: '0 auto'
   },
   brand: {
     alignItems: 'center',
     color: '#0f172a',
     display: 'inline-flex',
     flex: '0 0 auto',
-    gap: 10,
-    minWidth: 0,
-    textDecoration: 'none'
+    gap: 9,
+    textDecoration: 'none',
   },
   brandIcon: {
     alignItems: 'center',
-    background: '#ea580c',
-    borderRadius: 8,
-    color: '#ffffff',
+    background: 'linear-gradient(135deg, #f97316, #ea580c)',
+    borderRadius: 9,
+    boxShadow: '0 2px 8px rgba(234,88,12,0.35)',
+    color: '#fff',
     display: 'inline-flex',
     flex: '0 0 auto',
-    height: 36,
+    height: 34,
     justifyContent: 'center',
-    width: 36
+    width: 34,
   },
   brandText: {
-    color: '#0f172a',
-    fontSize: '1.25rem',
-    fontWeight: 700,
-    whiteSpace: 'nowrap'
+    fontSize: '1.05rem',
+    fontWeight: 800,
+    letterSpacing: '-0.02em',
+    whiteSpace: 'nowrap',
   },
   links: {
     alignItems: 'center',
     display: 'flex',
     flex: '1 1 auto',
-    gap: 24,
+    gap: 4,
     justifyContent: 'center',
-    minWidth: 0,
-    overflowX: 'auto',
-    scrollbarWidth: 'none'
+    '@media(maxWidth:768px)': { display: 'none' },
   },
   navLink: {
     alignItems: 'center',
+    borderRadius: 8,
     color: '#64748b',
     display: 'inline-flex',
-    flex: '0 0 auto',
-    fontSize: '0.95rem',
+    fontSize: '0.9rem',
     fontWeight: 500,
-    gap: 6,
-    minHeight: 36,
+    gap: 5,
+    padding: '6px 12px',
     textDecoration: 'none',
+    transition: 'color 0.15s, background 0.15s',
     whiteSpace: 'nowrap',
-    transition: 'color 0.2s ease'
   },
   navLinkActive: {
+    background: '#fff7ed',
     color: '#ea580c',
-    fontWeight: 600
+    fontWeight: 600,
   },
   actions: {
     alignItems: 'center',
     display: 'flex',
-    flex: '0 1 auto',
-    gap: 16,
-    justifyContent: 'flex-end',
-    minWidth: 0
+    flex: '0 0 auto',
+    gap: 10,
+  },
+  userChip: {
+    alignItems: 'center',
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: 999,
+    display: 'flex',
+    gap: 8,
+    padding: '4px 12px 4px 4px',
+  },
+  avatar: {
+    alignItems: 'center',
+    background: 'linear-gradient(135deg, #f97316, #ea580c)',
+    borderRadius: '50%',
+    color: '#fff',
+    display: 'flex',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    height: 26,
+    justifyContent: 'center',
+    width: 26,
+  },
+  userName: {
+    color: '#0f172a',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    maxWidth: 120,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  logoutBtn: {
+    alignItems: 'center',
+    background: '#fef2f2',
+    border: '1px solid #fecaca',
+    borderRadius: 8,
+    color: '#dc2626',
+    display: 'inline-flex',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    gap: 6,
+    padding: '7px 14px',
   },
   loginLink: {
-    alignItems: 'center',
     color: '#64748b',
-    display: 'inline-flex',
-    flex: '0 0 auto',
-    fontSize: '0.95rem',
+    fontSize: '0.9rem',
     fontWeight: 500,
-    minHeight: 36,
-    textDecoration: 'none',
+    padding: '7px 12px',
+  },
+  loginLinkActive: { color: '#ea580c' },
+  registerBtn: {
+    background: 'linear-gradient(135deg, #f97316, #ea580c)',
+    borderRadius: 8,
+    boxShadow: '0 2px 8px rgba(234,88,12,0.3)',
+    color: '#fff',
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    padding: '8px 16px',
     whiteSpace: 'nowrap',
-    transition: 'color 0.2s ease'
   },
-  loginLinkActive: {
-    color: '#ea580c'
-  },
-  registerLink: {
+  mobileToggle: {
     alignItems: 'center',
-    background: '#ea580c',
-    borderRadius: 6,
-    color: '#ffffff',
-    display: 'inline-flex',
-    flex: '0 0 auto',
-    fontSize: '0.95rem',
-    fontWeight: 500,
-    minHeight: 36,
-    padding: '0 16px',
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-    transition: 'background-color 0.2s ease'
-  },
-  userNavInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    marginRight: 8,
-    paddingRight: 16,
-    borderRight: '1px solid #e2e8f0',
-    color: '#64748b',
-    fontSize: '0.9rem'
-  },
-  logoutButton: {
-    alignItems: 'center',
-    background: '#ea580c',
+    background: 'transparent',
     border: 0,
-    borderRadius: 6,
-    color: '#ffffff',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    flex: '0 0 auto',
+    borderRadius: 8,
+    color: '#475569',
+    display: 'none',
+    height: 36,
+    justifyContent: 'center',
+    padding: 0,
+    width: 36,
+  },
+  mobileMenu: {
+    background: '#fff',
+    borderTop: '1px solid #f1f5f9',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+    padding: '12px 16px 16px',
+  },
+  mobileLink: {
+    borderRadius: 8,
+    color: '#374151',
     fontSize: '0.95rem',
     fontWeight: 500,
-    gap: 7,
-    minHeight: 36,
-    padding: '0 16px',
-    whiteSpace: 'nowrap',
-    transition: 'background-color 0.2s ease'
-  }
-});
+    padding: '10px 14px',
+    textDecoration: 'none',
+  },
+  mobileDivider: {
+    background: '#f1f5f9',
+    height: 1,
+    margin: '8px 0',
+  },
+  mobileLogout: {
+    alignItems: 'center',
+    background: '#fef2f2',
+    border: 0,
+    borderRadius: 8,
+    color: '#dc2626',
+    display: 'flex',
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    gap: 8,
+    padding: '10px 14px',
+  },
+  mobileAuthRow: {
+    display: 'flex',
+    gap: 8,
+    marginTop: 4,
+  },
+  mobileLoginLink: {
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    color: '#475569',
+    flex: 1,
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    padding: '10px 0',
+    textAlign: 'center',
+  },
+  mobileRegisterBtn: {
+    background: 'linear-gradient(135deg, #f97316, #ea580c)',
+    borderRadius: 8,
+    color: '#fff',
+    flex: 1,
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    padding: '10px 0',
+    textAlign: 'center',
+  },
+};
 
 export default AppNavbar;

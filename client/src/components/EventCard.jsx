@@ -1,193 +1,272 @@
 import { format } from 'date-fns';
-import { Calendar, MapPin, Users, Heart } from 'lucide-react';
+import { Calendar, MapPin, Users, Heart, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { memo, useMemo, useState } from 'react';
-import { StyleSheet } from '../styles/StyleSheet';
+
+const CATEGORY_COLORS = {
+  Technology: { bg: '#eff6ff', text: '#1d4ed8', dot: '#3b82f6' },
+  Business:   { bg: '#f0fdf4', text: '#15803d', dot: '#22c55e' },
+  Cloud:      { bg: '#f5f3ff', text: '#6d28d9', dot: '#8b5cf6' },
+  Design:     { bg: '#fdf4ff', text: '#86198f', dot: '#d946ef' },
+};
+const defaultCatColor = { bg: '#fff7ed', text: '#ea580c', dot: '#f97316' };
 
 const getOptimizedImageUrl = (url) => {
   if (!url) return '';
   if (!url.includes('images.unsplash.com')) return url;
-
-  const separator = url.includes('?') ? '&' : '?';
-  return `${url}${separator}auto=format&fit=crop&w=640&q=70`;
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}auto=format&fit=crop&w=640&q=75`;
 };
 
 const EventCard = ({ event }) => {
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [liked, setLiked] = useState(false);
   const attendeeCount = event.attendeeCount || event.attendees?.length || 0;
   const imageUrl = useMemo(() => getOptimizedImageUrl(event.imageUrl), [event.imageUrl]);
-
-  const handleBookmark = (e) => {
-    e.preventDefault(); // Prevent link navigation
-    setIsBookmarked(!isBookmarked);
-  };
+  const catColor = CATEGORY_COLORS[event.category] || defaultCatColor;
+  const fillPct = event.capacity ? Math.min(100, Math.round((attendeeCount / event.capacity) * 100)) : 0;
 
   return (
-    <article style={styles.card}>
-      <Link to={`/events/${event._id}`} style={styles.link}>
-        <div style={styles.imageWrap}>
+    <article style={s.card}>
+      <Link to={`/events/${event._id}`} style={s.link}>
+        {/* Image */}
+        <div style={s.imgWrap}>
           {imageUrl ? (
-            <img alt={event.title} decoding="async" loading="lazy" src={imageUrl} style={styles.image} />
+            <img alt={event.title} decoding="async" loading="lazy" src={imageUrl} style={s.img} />
           ) : (
-            <div style={styles.placeholderImage}>{event.category}</div>
+            <div style={{ ...s.imgPlaceholder, background: catColor.bg, color: catColor.text }}>
+              <span style={s.placeholderText}>{event.category}</span>
+            </div>
           )}
+          {/* Gradient overlay */}
+          <div style={s.imgGradient} />
+          {/* Category pill on image */}
+          <span style={{ ...s.catPill, background: catColor.bg, color: catColor.text }}>
+            <span style={{ ...s.catDot, background: catColor.dot }} />
+            {event.category}
+          </span>
+          {/* Heart button */}
           <button
             aria-label="Save event"
-            onClick={handleBookmark}
-            style={{
-              ...styles.bookmarkButton,
-              ...(isBookmarked ? styles.bookmarkButtonActive : null)
-            }}
+            onClick={(e) => { e.preventDefault(); setLiked(l => !l); }}
+            style={{ ...s.heartBtn, ...(liked ? s.heartBtnActive : {}) }}
             type="button"
           >
-            <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
+            <Heart size={15} fill={liked ? 'currentColor' : 'none'} strokeWidth={2} />
           </button>
         </div>
-        <div style={styles.body}>
-          <div style={styles.metaTop}>
-            <span style={styles.categoryTag}>{event.category}</span>
-            <span style={styles.attendeeCount}>
-              <Users size={14} /> {attendeeCount} / {event.capacity}
+
+        {/* Body */}
+        <div style={s.body}>
+          <h2 style={s.title}>{event.title}</h2>
+          <p style={s.desc}>{event.description}</p>
+
+          {/* Meta */}
+          <div style={s.meta}>
+            <span style={s.metaItem}>
+              <Calendar size={13} style={{ flexShrink: 0 }} />
+              {format(new Date(event.startsAt), 'dd MMM yyyy')}
+            </span>
+            <span style={s.metaItem}>
+              <MapPin size={13} style={{ flexShrink: 0 }} />
+              {event.location}
             </span>
           </div>
-          <h2 style={styles.title}>{event.title}</h2>
-          <p style={styles.description}>{event.description}</p>
-          <div style={styles.metaBottom}>
-            <span style={styles.fact}>
-              <Calendar size={14} /> {format(new Date(event.startsAt), 'dd MMM yyyy, h:mm a')}
-            </span>
-            <span style={styles.fact}>
-              <MapPin size={14} /> {event.location}
+
+          {/* Capacity bar */}
+          <div style={s.capacityRow}>
+            <div style={s.capacityBar}>
+              <div style={{ ...s.capacityFill, width: `${fillPct}%`, background: fillPct >= 90 ? '#ef4444' : '#f97316' }} />
+            </div>
+            <span style={s.capacityLabel}>
+              <Users size={12} /> {attendeeCount}/{event.capacity}
             </span>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div style={s.footer}>
+          <span style={s.viewLink}>View details <ArrowUpRight size={14} /></span>
         </div>
       </Link>
     </article>
   );
 };
 
-const styles = StyleSheet.create({
+const s = {
   card: {
-    background: '#ffffff',
+    background: '#fff',
     border: '1px solid #e2e8f0',
-    borderRadius: 12,
-    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)',
-    contentVisibility: 'auto',
-    containIntrinsicSize: '360px',
+    borderRadius: 16,
+    boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.04)',
     display: 'flex',
     flexDirection: 'column',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    transition: 'box-shadow 0.2s, transform 0.2s',
   },
   link: {
     color: 'inherit',
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    textDecoration: 'none'
+    textDecoration: 'none',
   },
-  imageWrap: {
+  imgWrap: {
     background: '#f1f5f9',
     height: 180,
+    overflow: 'hidden',
     position: 'relative',
-    width: '100%'
+    width: '100%',
   },
-  image: {
+  img: {
     height: '100%',
     objectFit: 'cover',
-    transform: 'translateZ(0)',
-    width: '100%'
+    width: '100%',
+    transition: 'transform 0.3s ease',
   },
-  placeholderImage: {
+  imgGradient: {
+    background: 'linear-gradient(to top, rgba(15,23,42,0.2) 0%, transparent 50%)',
+    bottom: 0,
+    left: 0,
+    pointerEvents: 'none',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  imgPlaceholder: {
     alignItems: 'center',
-    color: '#94a3b8',
     display: 'flex',
-    fontWeight: 600,
     height: '100%',
     justifyContent: 'center',
-    textTransform: 'uppercase',
-    width: '100%'
+    width: '100%',
   },
-  bookmarkButton: {
+  placeholderText: {
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase',
+  },
+  catPill: {
     alignItems: 'center',
-    background: '#ffffff',
+    borderRadius: 999,
+    bottom: 10,
+    display: 'inline-flex',
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    gap: 5,
+    left: 10,
+    letterSpacing: '0.04em',
+    padding: '4px 9px',
+    position: 'absolute',
+    textTransform: 'uppercase',
+  },
+  catDot: {
+    borderRadius: '50%',
+    display: 'inline-block',
+    height: 6,
+    width: 6,
+  },
+  heartBtn: {
+    alignItems: 'center',
+    background: 'rgba(255,255,255,0.9)',
+    backdropFilter: 'blur(8px)',
     border: 0,
     borderRadius: '50%',
-    boxShadow: '0 3px 8px rgba(15, 23, 42, 0.1)',
-    color: '#475569',
+    boxShadow: '0 2px 8px rgba(15,23,42,0.12)',
+    color: '#94a3b8',
     display: 'flex',
     height: 32,
     justifyContent: 'center',
     position: 'absolute',
-    right: 12,
-    top: 12,
-    width: 32
+    right: 10,
+    top: 10,
+    transition: 'background 0.15s, color 0.15s',
+    width: 32,
   },
-  bookmarkButtonActive: {
-    background: '#ffedd5',
-    color: '#ea580c'
+  heartBtnActive: {
+    background: '#fff1f2',
+    color: '#f43f5e',
   },
   body: {
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    padding: 16
-  },
-  metaTop: {
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: 12
-  },
-  categoryTag: {
-    background: '#ffedd5',
-    borderRadius: 6,
-    color: '#ea580c',
-    fontSize: '0.7rem',
-    fontWeight: 700,
-    padding: '4px 10px',
-    textTransform: 'uppercase'
-  },
-  attendeeCount: {
-    alignItems: 'center',
-    color: '#64748b',
-    display: 'flex',
-    fontSize: '0.8rem',
-    fontWeight: 600,
-    gap: 6
+    gap: 8,
+    padding: '14px 16px 10px',
   },
   title: {
     color: '#0f172a',
-    fontSize: '1.15rem',
+    fontSize: '1rem',
     fontWeight: 700,
+    letterSpacing: '-0.01em',
     lineHeight: 1.3,
-    margin: '0 0 8px'
+    margin: 0,
   },
-  description: {
-    color: '#475569',
+  desc: {
+    color: '#64748b',
     display: '-webkit-box',
     flex: 1,
-    fontSize: '0.9rem',
+    fontSize: '0.85rem',
     lineHeight: 1.5,
-    margin: '0 0 16px',
+    margin: 0,
     overflow: 'hidden',
     WebkitBoxOrient: 'vertical',
-    WebkitLineClamp: 2
+    WebkitLineClamp: 2,
   },
-  metaBottom: {
+  meta: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 5,
+    marginTop: 4,
+  },
+  metaItem: {
     alignItems: 'center',
-    borderTop: '1px solid #f1f5f9',
     color: '#64748b',
     display: 'flex',
-    fontSize: '0.8rem',
+    fontSize: '0.78rem',
     fontWeight: 500,
-    justifyContent: 'space-between',
-    paddingTop: 12
+    gap: 5,
   },
-  fact: {
+  capacityRow: {
     alignItems: 'center',
     display: 'flex',
-    gap: 4
-  }
-});
+    gap: 8,
+    marginTop: 6,
+  },
+  capacityBar: {
+    background: '#f1f5f9',
+    borderRadius: 999,
+    flex: 1,
+    height: 4,
+    overflow: 'hidden',
+  },
+  capacityFill: {
+    borderRadius: 999,
+    height: '100%',
+    transition: 'width 0.3s ease',
+  },
+  capacityLabel: {
+    alignItems: 'center',
+    color: '#94a3b8',
+    display: 'flex',
+    flex: '0 0 auto',
+    fontSize: '0.73rem',
+    fontWeight: 600,
+    gap: 3,
+  },
+  footer: {
+    borderTop: '1px solid #f1f5f9',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    padding: '10px 16px',
+  },
+  viewLink: {
+    alignItems: 'center',
+    color: '#ea580c',
+    display: 'inline-flex',
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    gap: 3,
+  },
+};
 
 export default memo(EventCard);
