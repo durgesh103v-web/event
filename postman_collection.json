@@ -1,0 +1,144 @@
+{
+  "info": {
+    "name": "Event Management System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Durgesh Vishwakarma\",\n  \"email\": \"durgesh@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Get Current User",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/auth/me"
+      }
+    },
+    {
+      "name": "List Events",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events?page=1&limit=6&search="
+      }
+    },
+    {
+      "name": "Create Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"MERN Hiring Meetup\",\n  \"description\": \"A technical event for MERN developers and hiring teams.\",\n  \"category\": \"Technology\",\n  \"location\": \"Mumbai\",\n  \"startsAt\": \"2026-07-10T10:00:00.000Z\",\n  \"capacity\": 100,\n  \"imageUrl\": \"https://images.unsplash.com/photo-1515187029135-18ee286d815b\"\n}"
+        },
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "Get Event Details",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events/{{eventId}}"
+      }
+    },
+    {
+      "name": "Get Event Attendees",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events/{{eventId}}/attendees"
+      }
+    },
+    {
+      "name": "Update Event",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated MERN Hiring Meetup\",\n  \"description\": \"An updated technical event for MERN developers and hiring teams.\",\n  \"category\": \"Technology\",\n  \"location\": \"Mumbai\",\n  \"startsAt\": \"2026-07-10T10:00:00.000Z\",\n  \"capacity\": 120,\n  \"imageUrl\": \"https://images.unsplash.com/photo-1515187029135-18ee286d815b\"\n}"
+        },
+        "url": "{{baseUrl}}/events/{{eventId}}"
+      }
+    },
+    {
+      "name": "Register For Event",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/events/{{eventId}}/register"
+      }
+    },
+    {
+      "name": "Cancel Registration",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/events/{{eventId}}/register"
+      }
+    },
+    {
+      "name": "My Registered Events",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/registrations/my-events"
+      }
+    },
+    {
+      "name": "Delete Event",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/events/{{eventId}}"
+      }
+    }
+  ]
+}
