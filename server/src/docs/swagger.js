@@ -15,8 +15,8 @@ export const swaggerSpec = swaggerJsdoc({
     },
     servers: [
       {
-        url: 'http://localhost:5000/api',
-        description: 'Local API'
+        url: '/api',
+        description: 'Current API server'
       }
     ],
     components: {

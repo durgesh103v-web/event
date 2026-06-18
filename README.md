@@ -52,6 +52,8 @@ MERN Stack technical assignment for Biz Technologies IT Solutions Ltd / Blockcoa
 |   `-- Dockerfile
 |-- docker-compose.yml
 |-- package.json
+|-- render.yaml            # Render API Blueprint
+|-- vercel.json            # Vercel client build and SPA routing
 `-- postman_collection.json
 ```
 
@@ -159,16 +161,52 @@ Import `postman_collection.json` into Postman for ready-made API requests.
 - Rate limiting helps reduce abuse.
 - MongoDB ObjectId validation is applied on parameterized routes.
 
-## Deployment Notes
+## Vercel + Render Deployment
 
-Suggested AWS deployment path:
+The repository includes `vercel.json` for the React client and `render.yaml` for the Express API.
 
-1. Build and host the React app on S3 with CloudFront.
-2. Deploy the Express server on EC2, Elastic Beanstalk, ECS, or App Runner.
-3. Use MongoDB Atlas for the database.
-4. Store secrets in AWS Systems Manager Parameter Store or Secrets Manager.
-5. Configure `CLIENT_URL`, `MONGO_URI`, and `JWT_SECRET` in the backend environment.
-6. Set `VITE_API_URL` during frontend build to the production API URL.
+### 1. Prepare MongoDB Atlas
+
+1. Create an Atlas cluster and database user.
+2. Allow connections from Render in Atlas Network Access.
+3. Copy the Atlas connection string for `MONGO_URI`.
+
+### 2. Deploy the API to Render
+
+1. In Render, create a Blueprint from this repository. Render detects `render.yaml`.
+2. Enter `MONGO_URI` when prompted.
+3. Initially set `CLIENT_URL` to the expected Vercel URL, for example `https://your-app.vercel.app`.
+4. Deploy and verify:
+   - Health: `https://your-api.onrender.com/api/health`
+   - Swagger: `https://your-api.onrender.com/api/docs`
+
+Render generates `JWT_SECRET` automatically. Do not commit production secrets.
+
+### 3. Deploy the Client to Vercel
+
+1. Import this repository into Vercel and keep the project root at the repository root.
+2. Add the environment variable:
+
+```bash
+VITE_API_URL=https://your-api.onrender.com/api
+```
+
+3. Deploy. `vercel.json` builds only the `client` workspace and preserves React Router URLs.
+
+### 4. Finalize CORS
+
+Set Render's `CLIENT_URL` to the final Vercel production URL and redeploy the API. Multiple exact origins can be comma-separated, for example:
+
+```bash
+CLIENT_URL=https://your-app.vercel.app,https://www.example.com
+```
+
+### Deployment Checks
+
+- Open the Vercel application and load an event details URL directly.
+- Register or sign in and confirm protected API calls work.
+- Confirm Render `/api/health` returns `{ "status": "ok" }`.
+- Confirm Swagger's **Try it out** requests use the Render origin.
 
 ## CI/CD Suggestion
 

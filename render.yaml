@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: event-management-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev --workspace server
+    startCommand: node server/src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        sync: false

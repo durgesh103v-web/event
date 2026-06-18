@@ -2,10 +2,12 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --omit=dev
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/package.json
+COPY server/package.json ./server/package.json
+RUN npm ci --omit=dev --workspace server
 
-COPY src ./src
+COPY server/src ./server/src
 
 EXPOSE 5000
-CMD ["npm", "start"]
+CMD ["node", "server/src/server.js"]
