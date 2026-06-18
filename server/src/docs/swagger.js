@@ -23,12 +23,21 @@ export const swaggerSpec = swaggerJsdoc({
         }
       },
       schemas: {
+        RegisterPayload: {
+          type: 'object',
+          required: ['name', 'email', 'password'],
+          properties: {
+            name: { type: 'string', example: 'Jane Smith' },
+            email: { type: 'string', format: 'email', example: 'jane@example.com' },
+            password: { type: 'string', format: 'password', example: 'password123' }
+          }
+        },
         AuthPayload: {
           type: 'object',
           required: ['email', 'password'],
           properties: {
-            email: { type: 'string', example: 'admin@example.com' },
-            password: { type: 'string', example: 'password123' }
+            email: { type: 'string', format: 'email', example: 'admin@example.com' },
+            password: { type: 'string', format: 'password', example: 'password123' }
           }
         },
         EventInput: {
@@ -47,5 +56,5 @@ export const swaggerSpec = swaggerJsdoc({
       }
     }
   },
-  apis: ['./src/routes/*.js']
+  apis: ['./src/app.js', './src/routes/*.js']
 });
