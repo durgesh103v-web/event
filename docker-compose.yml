@@ -14,9 +14,7 @@ services:
     restart: unless-stopped
 
   server:
-    build:
-      context: .
-      dockerfile: server/Dockerfile
+    build: ./server
     container_name: event-management-server
     depends_on:
       mongo:
