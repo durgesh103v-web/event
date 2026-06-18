@@ -378,6 +378,7 @@ const s = {
   sep: { background: '#273449', flexShrink: 0, height: 28, width: 1 },
   searchBtn: {
     alignItems: 'center',
+    justifyContent: 'center',
     alignSelf: 'stretch',
     background: 'linear-gradient(135deg,#f97316,#ea580c)',
     border: 0,
@@ -390,8 +391,9 @@ const s = {
     fontSize: '0.9rem',
     fontWeight: 700,
     gap: 6,
-    padding: '0 20px',
+    padding: '10px 20px',
     whiteSpace: 'nowrap',
+    minHeight: 44,
   },
   sectionHead: {
     alignItems: 'center',
