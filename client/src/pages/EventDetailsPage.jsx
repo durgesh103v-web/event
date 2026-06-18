@@ -5,11 +5,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import api, { getErrorMessage } from '../api/client';
 import StatusMessage from '../components/StatusMessage';
 import { useAuth } from '../context/AuthContext';
+import useMediaQuery from '../hooks/useMediaQuery';
 
 const EventDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -77,7 +79,7 @@ const EventDetailsPage = () => {
       <StatusMessage type="success">{message}</StatusMessage>
 
       {/* Hero layout */}
-      <div style={s.hero}>
+      <div style={{ ...s.hero, ...(isMobile ? s.heroMobile : {}) }}>
         {/* Image */}
         <div style={s.imgCol}>
           {event.imageUrl ? (
@@ -106,7 +108,7 @@ const EventDetailsPage = () => {
           <h1 style={s.title}>{event.title}</h1>
           <p style={s.desc}>{event.description}</p>
 
-          <div style={s.factsGrid}>
+          <div style={{ ...s.factsGrid, ...(isMobile ? s.factsGridMobile : {}) }}>
             <div style={s.factCard}>
               <Calendar size={18} color="#f97316" />
               <div>
@@ -237,6 +239,7 @@ const s = {
     overflow: 'hidden',
     padding: 28,
   },
+  heroMobile: { gridTemplateColumns: '1fr', padding: 20 },
   imgCol: { display: 'flex', flexDirection: 'column', gap: 16 },
   img: { borderRadius: 14, height: 360, objectFit: 'cover', width: '100%' },
   imgPlaceholder: {
@@ -278,6 +281,7 @@ const s = {
   title: { color: '#f8fafc', fontSize: '2.2rem', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.1, margin: 0 },
   desc: { color: '#94a3b8', fontSize: '0.97rem', lineHeight: 1.65, margin: 0 },
   factsGrid: { display: 'grid', gap: 10, gridTemplateColumns: '1fr 1fr' },
+  factsGridMobile: { gridTemplateColumns: '1fr' },
   factCard: {
     alignItems: 'flex-start',
     background: '#111c2e',

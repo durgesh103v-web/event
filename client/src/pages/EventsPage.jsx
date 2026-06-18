@@ -79,7 +79,7 @@ const EventsPage = () => {
             </p>
 
             {/* Stats row */}
-            <div style={s.statsRow}>
+            <div style={{ ...s.statsRow, ...(isMobile ? s.statsRowMobile : {}) }}>
               <div style={s.statCard}>
                 <TrendingUp size={18} color="#f97316" />
                 <div>
@@ -87,7 +87,7 @@ const EventsPage = () => {
                   <span style={s.statLabel}>Events</span>
                 </div>
               </div>
-              <div style={s.statDivider} />
+              <div style={{ ...s.statDivider, ...(isMobile ? s.statDividerMobile : {}) }} />
               <div style={s.statCard}>
                 <Users size={18} color="#f97316" />
                 <div>
@@ -95,7 +95,7 @@ const EventsPage = () => {
                   <span style={s.statLabel}>Attendees</span>
                 </div>
               </div>
-              <div style={s.statDivider} />
+              <div style={{ ...s.statDivider, ...(isMobile ? s.statDividerMobile : {}) }} />
               <div style={s.statCard}>
                 <CalendarDays size={18} color="#f97316" />
                 <div>
@@ -302,9 +302,14 @@ const s = {
     gap: 0,
     padding: '14px 20px',
     width: 'fit-content',
+    boxSizing: 'border-box',
+    maxWidth: '100%',
+    overflowX: 'auto',
   },
-  statCard: { alignItems: 'center', display: 'flex', gap: 10 },
-  statDivider: { background: 'rgba(255,255,255,0.1)', height: 28, margin: '0 20px', width: 1 },
+  statsRowMobile: { padding: '12px 14px' },
+  statCard: { alignItems: 'center', display: 'flex', gap: 10, flexShrink: 0 },
+  statDivider: { background: 'rgba(255,255,255,0.1)', height: 28, margin: '0 20px', width: 1, flexShrink: 0 },
+  statDividerMobile: { margin: '0 12px' },
   statNum: { color: '#f8fafc', display: 'block', fontSize: '1.2rem', fontWeight: 800 },
   statLabel: { color: '#64748b', display: 'block', fontSize: '0.72rem', fontWeight: 600 },
   heroRight: { height: 280, position: 'relative' },
@@ -347,6 +352,7 @@ const s = {
     boxShadow: '0 8px 24px rgba(0,0,0,0.22)',
     padding: 6,
     width: '100%',
+    boxSizing: 'border-box',
   },
   searchForm: { alignItems: 'center', display: 'flex', gap: 0, width: '100%' },
   searchFormTablet: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4, padding: 4 },
